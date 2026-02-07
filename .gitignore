@@ -1,13 +1,39 @@
+# IDE & OS
 *.iml
-.gradle
 .idea
 .DS_Store
+xcuserdata
+*.xcuserstate
+
+# Build & Gradle
+.gradle
 build
-captures
+out
 .externalNativeBuild
 .cxx
-local.properties
-xcuserdata
+captures
+
+# Kotlin
 .kotlin
-#So we don't accidentally commit our private keys
+.konan
+
+# Android
+local.properties
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# iOS / Xcode
+Pods/
+DerivedData/
+*.xcworkspace
+!default.xcworkspace
+
+# Keys & secrets
 *.gpg
+*.jks
+*.keystore
+.env
+.env.local
