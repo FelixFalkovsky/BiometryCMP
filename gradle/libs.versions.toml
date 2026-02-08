@@ -6,15 +6,29 @@ android-compileSdk = "34"
 android-targetSdk = "34"
 vanniktechMavenPublish = "0.34.0"
 kotlinxCoroutines = "1.7.3"
+kotlinxCoroutinesTest = "1.7.3"
 biometric = "1.1.0"
+composeBom = "1.8.2"
+composePlugin = "1.8.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+compose-bom = { module = "org.jetbrains.compose:compose-bom", version.ref = "composeBom" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeBom" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeBom" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "composeBom" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeBom" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeBom" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinCompose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "composePlugin" }
 vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }
