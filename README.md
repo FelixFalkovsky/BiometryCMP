@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="images/icon.png" width="96" alt="Biometry Auth KMP" />
+  <img src="images/icon_biometry.png" width="96" alt="Biometry Auth KMP" />
 </p>
 
 # Biometry Auth KMP
