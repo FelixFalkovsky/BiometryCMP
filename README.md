@@ -10,6 +10,7 @@
 - [Требования](#требования)
 - [Установка](#установка)
 - [Использование](#использование)
+- [Sample](#sample)
 - [Что библиотека не делает](#что-библиотека-не-делает)
 - [Сборка и разработка](#сборка-и-разработка)
 - [Публикация](#публикация)
@@ -141,6 +142,40 @@ lifecycleScope.launch(Dispatchers.Main) {
 <key>NSFaceIDUsageDescription</key>
 <string>Аутентификация с помощью Face ID или Touch ID</string>
 ```
+
+---
+
+## Sample
+
+Примеры для проверки реализации библиотеки (собственный код, отличный от других библиотек):
+
+| Модуль              | Описание                              | Запуск |
+|---------------------|----------------------------------------|--------|
+| `sample/androidApp` | Демо-приложение Android (проверка + вход) | см. ниже |
+| `sample/iosApp`     | Инструкция по сборке фреймворка и Xcode | см. [sample/iosApp/README.md](sample/iosApp/README.md) |
+
+**Структура:**
+
+```
+sample/
+├── androidApp/     # Android-приложение, зависимость project(":biometry")
+│   └── src/main/   # MainActivity, layout, манифест с USE_BIOMETRIC
+└── iosApp/         # README + сборка фреймворка, интеграция в Xcode вручную
+```
+
+**Запуск Android sample:**
+
+```bash
+# Сборка debug-APK
+./gradlew :sample:androidApp:assembleDebug
+
+# Установка на подключённое устройство или эмулятор
+./gradlew :sample:androidApp:installDebug
+```
+
+В приложении: две кнопки — «Проверить доступность» и «Войти по биометрии»; результат выводится в текстовое поле и в Toast.
+
+**iOS:** фреймворк собирается командой `./gradlew :biometry:linkDebugFrameworkIosSimulatorArm64`; пошаговая интеграция в Xcode — в [sample/iosApp/README.md](sample/iosApp/README.md).
 
 ---
 

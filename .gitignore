@@ -28,6 +28,7 @@ local.properties
 # iOS / Xcode
 Pods/
 DerivedData/
+sample/iosApp/Frameworks/
 *.xcworkspace
 !default.xcworkspace
 
@@ -37,3 +38,9 @@ DerivedData/
 *.keystore
 .env
 .env.local
+
+# Rules
+BiometryAuth-KMP-Plan.md
+
+# Cursor
+.cursor/
