@@ -24,11 +24,7 @@ class BiometrySampleStateHolder(
     val state: StateFlow<BiometrySampleUiState> = _state.asStateFlow()
 
     fun openSheet() {
-        scope.launch {
-            withContext(Dispatchers.Main) {
-                _state.update { it.copy(sheetVisible = true) }
-            }
-        }
+        _state.update { it.copy(sheetVisible = true) }
     }
 
     fun closeSheet() {

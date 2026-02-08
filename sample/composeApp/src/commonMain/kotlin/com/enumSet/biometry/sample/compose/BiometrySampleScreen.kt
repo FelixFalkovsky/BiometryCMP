@@ -1,6 +1,7 @@
 package com.enumSet.biometry.sample.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,11 +32,14 @@ import com.enumSet.biometry.createBiometryAuthenticator
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BiometrySampleScreen(
-    authenticator: BiometryAuthenticator = createBiometryAuthenticator()
+    authenticator: BiometryAuthenticator? = null
 ) {
     val scope = rememberCoroutineScope()
-    val holder = remember(authenticator) {
-        BiometrySampleStateHolder(authenticator, scope)
+    val resolvedAuthenticator: BiometryAuthenticator = remember(authenticator) {
+        if (authenticator != null) authenticator else createBiometryAuthenticator()
+    }
+    val holder = remember(resolvedAuthenticator) {
+        BiometrySampleStateHolder(resolvedAuthenticator, scope)
     }
     val uiState = holder.state.collectAsState().value
 
@@ -63,16 +65,19 @@ fun BiometrySampleScreen(
             when {
                 uiState.authSuccess -> SuccessContent(onRepeat = { holder.resetSuccess() })
                 uiState.authFailure -> FailureContent(onRepeat = { holder.resetFailure() })
-                else -> MainContent(onBiometryClick = { holder.openSheet() })
+                else -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { holder.openSheet() }
+                ) {
+                    MainContent(onBiometryClick = { holder.openSheet() })
+                }
             }
         }
     }
 
     if (uiState.sheetVisible) {
-        ModalBottomSheet(
-            onDismissRequest = { holder.closeSheet() },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ) {
+        PlatformModalSheet(onDismissRequest = { holder.closeSheet() }) {
             SheetContent(
                 biometryTypeText = uiState.biometryTypeText,
                 isAvailable = uiState.isAvailable,

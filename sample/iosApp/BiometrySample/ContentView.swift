@@ -4,6 +4,7 @@ import ComposeApp
 struct ContentView: View {
     var body: some View {
         ComposeHostView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
     }
 }

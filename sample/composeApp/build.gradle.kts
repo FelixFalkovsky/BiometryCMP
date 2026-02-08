@@ -19,8 +19,6 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { target ->
         target.binaries.framework {
-            // Имя фреймворка и префикс в Swift (import ComposeApp, ComposeAppMainKt).
-            // Gradle-модуль — :sample:composeApp (lowercase), это разные уровни именования.
             baseName = "ComposeApp"
             isStatic = true
         }
