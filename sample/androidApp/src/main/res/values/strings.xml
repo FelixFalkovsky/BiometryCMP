@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Biometry Sample</string>
+    <string name="btn_check">Проверить доступность</string>
+    <string name="btn_authenticate">Войти по биометрии</string>
+    <string name="status_placeholder">Нажмите кнопку для проверки или входа</string>
+</resources>
