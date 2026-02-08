@@ -1,4 +1,4 @@
-<p align="center">
+<p align="left">
   <img src="images/icon.png" width="96" alt="Biometry Auth KMP" />
 </p>
 
