@@ -1,8 +1,6 @@
 <p align="left">
-  <img src="images/icon_biometry.png" width="256" alt="Biometry Auth KMP" />
+  <img src="images/icon_with_title.png" width="512" alt="Biometry Auth KMP" />
 </p>
-
-# Biometry Auth KMP
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/enumset/biometry-auth-kmp)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.2.20-purple.svg?logo=kotlin)](http://kotlinlang.org)
