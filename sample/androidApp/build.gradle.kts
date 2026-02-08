@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.enumSet.biometry.sample"
+    namespace = "dev.enumset.biometry.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.enumSet.biometry.sample"
+        applicationId = "dev.enumset.biometry.sample"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

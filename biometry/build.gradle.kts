@@ -7,12 +7,12 @@ plugins {
     alias(libs.plugins.vanniktech.mavenPublish)
 }
 
-group = "com.enumSet"
+group = "dev.enumset"
 version = "1.0.0"
 
 kotlin {
     androidLibrary {
-        namespace = "com.enumSet.biometry"
+        namespace = "dev.enumset.biometry"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -46,7 +46,7 @@ kotlin {
         target.binaries.framework {
             baseName = "BiometryAuthKMP"
             isStatic = true
-            binaryOption("bundleId", "com.enumset.biometry.auth")
+            binaryOption("bundleId", "dev.enumset.biometry.auth")
         }
     }
 

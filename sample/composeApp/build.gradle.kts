@@ -54,7 +54,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.enumSet.biometry.sample.compose"
+    namespace = "dev.enumset.biometry.sample.compose"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

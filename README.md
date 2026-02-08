@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/icon.png" width="96" alt="Biometry Auth KMP" />
+  <img src="https://raw.githubusercontent.com/enumset/biometry-auth-kmp/main/images/icon.png" width="96" alt="Biometry Auth KMP" />
 </p>
 
 # Biometry Auth KMP
@@ -63,7 +63,7 @@ repositories {
 ```kotlin
 // commonMain
 commonMain.dependencies {
-    implementation("com.enumSet:biometry-auth:1.0.0")
+    implementation("dev.enumset:biometry-auth:1.0.0")
 }
 ```
 
@@ -103,7 +103,7 @@ when (val result = authenticator.authenticate(
 1. Before using biometry, set the `FragmentActivity` (e.g. in `onCreate`):
 
 ```kotlin
-import com.enumSet.biometry.setFragmentActivityForBiometry
+import dev.enumset.biometry.setFragmentActivityForBiometry
 
 // In your FragmentActivity
 setFragmentActivityForBiometry(this)
