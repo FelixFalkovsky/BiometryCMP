@@ -35,9 +35,18 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { target ->
+        target.compilations.getByName("main").cinterops {
+            val LocalAuthentication by creating {
+                definitionFile.set(project.file("src/nativeInterop/cinterop/LocalAuthentication.def"))
+            }
+        }
+        target.binaries.all {
+            linkerOpts("-framework", "LocalAuthentication")
+        }
         target.binaries.framework {
             baseName = "BiometryAuthKMP"
             isStatic = true
+            binaryOption("bundleId", "com.enumset.biometry.auth")
         }
     }
 
