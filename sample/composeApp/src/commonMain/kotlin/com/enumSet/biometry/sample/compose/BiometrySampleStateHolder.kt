@@ -12,10 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Держатель состояния экрана биометрии (Single Responsibility).
- * Зависит от [BiometryAuthenticator] (Dependency Inversion) — в тестах подставляется fake.
- */
+
 class BiometrySampleStateHolder(
     private val authenticator: BiometryAuthenticator,
     private val scope: CoroutineScope
@@ -31,7 +28,6 @@ class BiometrySampleStateHolder(
         _state.update { it.copy(sheetVisible = false) }
     }
 
-    /** Загружает доступность биометрии и обновляет [BiometrySampleUiState.biometryTypeText], [BiometrySampleUiState.isAvailable]. */
     fun loadAvailability() {
         scope.launch {
             val availability: BiometryAvailability = authenticator.isBiometryAvailable()
