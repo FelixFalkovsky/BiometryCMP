@@ -1,127 +1,123 @@
+<p align="center">
+  <img src="images/icon.png" width="96" alt="Biometry Auth KMP" />
+</p>
+
 # Biometry Auth KMP
 
-<!-- TODO: добавить бейджи после публикации: license, Maven Central version, Kotlin version -->
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/enumset/biometry-auth-kmp)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.2.20-purple.svg?logo=kotlin)](http://kotlinlang.org)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey.svg)](https://kotlinlang.org/docs/multiplatform.html)
 
-Библиотека [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) для биометрической аутентификации (Touch ID, Face ID, отпечаток) на Android и iOS из общего кода.
-
-## Содержание
-
-- [Возможности](#возможности)
-- [Требования](#требования)
-- [Установка](#установка)
-- [Использование](#использование)
-- [Sample](#sample)
-- [Что библиотека не делает](#что-библиотека-не-делает)
-- [Сборка и разработка](#сборка-и-разработка)
-- [Публикация](#публикация)
-- [Contributing](#contributing)
-- [Лицензия](#лицензия)
+**Biometry authentication (Touch ID, Face ID, fingerprint) for Android and iOS from shared Kotlin Multiplatform code.**
 
 ---
 
-## Возможности
+## Table of Contents
 
-- Проверка доступности биометрии: [BiometryAuthenticator.isBiometryAvailable()](biometry/src/commonMain/kotlin/com/enumSet/biometry/BiometryAuthenticator.kt)
-- Запуск системного диалога аутентификации: [BiometryAuthenticator.authenticate()](biometry/src/commonMain/kotlin/com/enumSet/biometry/BiometryAuthenticator.kt)
-- Общие модели: [BiometryResult](biometry/src/commonMain/kotlin/com/enumSet/biometry/BiometryResult.kt), [BiometryAvailability](biometry/src/commonMain/kotlin/com/enumSet/biometry/BiometryAvailability.kt), [BiometryType](biometry/src/commonMain/kotlin/com/enumSet/biometry/BiometryType.kt)
-- **Android:** BiometricManager + BiometricPrompt (main thread)
-- **iOS:** LocalAuthentication (TODO: реализация в шаге 4 плана)
-
----
-
-## Требования
-
-- **Gradle:** 8.0+
-- **Kotlin:** 1.9+ (рекомендуется 2.0+)
-- **Android:** minSdk 23+, targetSdk 34+
-- **iOS:** 11.0+ (Touch ID / Face ID через LocalAuthentication)
-- **macOS** — для сборки и тестов iOS (симулятор)
-
-Установите:
-
-- JDK 17+
-- Android Studio (или IntelliJ IDEA с Android plugin)
-- Xcode (для iOS)
-- CocoaPods (опционально, если используется в sample-приложении)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Samples](#samples)
+- [Permissions](#permissions)
+- [Building](#building)
+- [License](#license)
 
 ---
 
-## Установка
+## Features
 
-<!-- TODO: после публикации в Maven Central заменить на актуальные group/artifact/version -->
+- **Check availability** — `BiometryAuthenticator.isBiometryAvailable()` returns `BiometryAvailability` (supported type, error message).
+- **Authenticate** — `BiometryAuthenticator.authenticate()` shows the system dialog and returns `BiometryResult` (Success / Cancelled / Error).
+- **Shared models** — `BiometryResult`, `BiometryAvailability`, `BiometryType` in `commonMain`.
+- **Android** — `BiometricManager` + `BiometricPrompt` (runs on main thread).
+- **iOS** — `LocalAuthentication` framework (Touch ID / Face ID).
 
-**Root `settings.gradle.kts` / `build.gradle.kts`** — репозитории:
+---
+
+## Requirements
+
+| | |
+|---|---|
+| **Gradle** | 8.0+ |
+| **Kotlin** | 2.0+ |
+| **Android** | minSdk 23+, compileSdk 34 |
+| **iOS** | 11.0+ |
+
+---
+
+## Installation
+
+**Repositories** (root `settings.gradle.kts` or `build.gradle.kts`):
 
 ```kotlin
-// allprojects или dependencyResolutionManagement
 repositories {
     mavenCentral()
     google()
 }
 ```
 
-**Модуль приложения** (KMP):
+**Dependency** (your KMP module):
 
 ```kotlin
-// kotlin { sourceSets { commonMain.dependencies { ... } } }
+// commonMain
 commonMain.dependencies {
-    implementation("com.enumSet:biometry-auth:1.0.0") // TODO: подставить версию после публикации
+    implementation("com.enumSet:biometry-auth:1.0.0")
 }
 ```
 
-Для только Android (без KMP) используйте соответствующий артефакт (например, `biometry-auth-android` — уточнить по итогам публикации).
-
 ---
 
-## Использование
+## Usage
 
-### Общий код (commonMain)
+### Common code
 
-Вызов из корутины (рекомендуется Main dispatcher для показа UI на Android):
+Use from a coroutine (recommended: `Dispatchers.Main` on Android for UI):
 
 ```kotlin
 val authenticator = createBiometryAuthenticator()
 
-// Проверка доступности
+// Check availability
 val availability = authenticator.isBiometryAvailable()
 if (!availability.isAvailable) {
     // availability.errorMessage, availability.biometryType
     return
 }
 
-// Запуск аутентификации
+// Authenticate
 when (val result = authenticator.authenticate(
-    title = "Вход",
-    subtitle = "Подтвердите личность",
-    negativeButtonText = "Отмена",
+    title = "Sign in",
+    subtitle = "Confirm your identity",
+    negativeButtonText = "Cancel",
     allowDeviceCredentials = true
 )) {
-    is BiometryResult.Success -> { /* успех */ }
-    is BiometryResult.Cancelled -> { /* отмена пользователем */ }
+    is BiometryResult.Success -> { /* success */ }
+    is BiometryResult.Cancelled -> { /* user cancelled */ }
     is BiometryResult.Error -> { /* result.message, result.code */ }
 }
 ```
 
 ### Android
 
-1. Перед использованием установите [FragmentActivity](https://developer.android.com/reference/androidx/fragment/app/FragmentActivity) (например, в `onCreate`):
+1. Before using biometry, set the `FragmentActivity` (e.g. in `onCreate`):
 
 ```kotlin
 import com.enumSet.biometry.setFragmentActivityForBiometry
 
-// в Activity (FragmentActivity)
+// In your FragmentActivity
 setFragmentActivityForBiometry(this)
 ```
 
-2. Вызывайте биометрию из корутины с Main dispatcher (показ диалога — на main thread):
+2. Call from a coroutine with `Dispatchers.Main` (dialog must run on main thread):
 
 ```kotlin
 lifecycleScope.launch(Dispatchers.Main) {
     val authenticator = createBiometryAuthenticator()
     val result = authenticator.authenticate(
-        title = "Вход",
-        subtitle = "Подтвердите личность",
-        negativeButtonText = "Отмена",
+        title = "Sign in",
+        subtitle = "Confirm your identity",
+        negativeButtonText = "Cancel",
         allowDeviceCredentials = true
     )
 }
@@ -129,96 +125,57 @@ lifecycleScope.launch(Dispatchers.Main) {
 
 ### iOS
 
-<!-- TODO: дополнить после реализации шага 4 (LocalAuthentication); указать NSFaceIDUsageDescription в Info.plist -->
+Use the same common API: `createBiometryAuthenticator()` and `authenticate()`. The `actual` implementation uses `LocalAuthentication`.
 
-```kotlin
-// Общий код тот же: createBiometryAuthenticator() + authenticate()
-// На iOS actual реализация использует LocalAuthentication.
-```
-
-В **Info.plist** приложения добавьте ключ для Face ID:
+Add to your app **Info.plist** (required for Face ID):
 
 ```xml
 <key>NSFaceIDUsageDescription</key>
-<string>Аутентификация с помощью Face ID или Touch ID</string>
+<string>Authenticate with Face ID or Touch ID</string>
 ```
 
 ---
 
-## Sample
+## Samples
 
-Примеры для проверки реализации библиотеки (собственный код, отличный от других библиотек):
+| Module | Description |
+|--------|-------------|
+| `sample/androidApp` | Android app (availability check + auth). |
+| `sample/composeApp` | Compose Multiplatform sample (Android + iOS). |
+| `sample/iosApp` | Native iOS app + Xcode integration. |
 
-| Модуль              | Описание                              | Запуск |
-|---------------------|----------------------------------------|--------|
-| `sample/androidApp` | Демо-приложение Android (проверка + вход) | см. ниже |
-| `sample/iosApp`     | Инструкция по сборке фреймворка и Xcode | см. [sample/iosApp/README.md](sample/iosApp/README.md) |
-
-**Структура:**
-
-```
-sample/
-├── androidApp/     # Android-приложение, зависимость project(":biometry")
-│   └── src/main/   # MainActivity, layout, манифест с USE_BIOMETRIC
-└── iosApp/         # README + сборка фреймворка, интеграция в Xcode вручную
-```
-
-**Запуск Android sample:**
+**Run Android sample:**
 
 ```bash
-# Сборка debug-APK
 ./gradlew :sample:androidApp:assembleDebug
-
-# Установка на подключённое устройство или эмулятор
 ./gradlew :sample:androidApp:installDebug
 ```
 
-В приложении: две кнопки — «Проверить доступность» и «Войти по биометрии»; результат выводится в текстовое поле и в Toast.
-
-**iOS:** фреймворк собирается командой `./gradlew :biometry:linkDebugFrameworkIosSimulatorArm64`; пошаговая интеграция в Xcode — в [sample/iosApp/README.md](sample/iosApp/README.md).
+**iOS:** build the framework with `./gradlew :biometry:linkDebugFrameworkIosSimulatorArm64` and follow [sample/iosApp/README.md](sample/iosApp/README.md) for Xcode.
 
 ---
 
-## Что библиотека не делает
+## Permissions
 
-- **Не объявляет разрешения в манифесте.** Их должно добавлять приложение.
-- **Android:** при необходимости укажите в манифесте приложения:
-  - `USE_BIOMETRIC` (API 28+)
-  - `USE_FINGERPRINT` (API 23–27, устарело в API 28)
-- Документация: [Biometric authentication | Android Developers](https://developer.android.com/identity/sign-in/biometric-auth)
+The library does **not** declare permissions. Your app must add them.
+
+**Android** — in your app manifest:
+
+- `USE_BIOMETRIC` (API 28+)
+- `USE_FINGERPRINT` (API 23–27, deprecated in 28)
+
+See [Biometric authentication \| Android Developers](https://developer.android.com/identity/sign-in/biometric-auth).
 
 ---
 
-## Сборка и разработка
+## Building
 
 ```bash
 ./gradlew :biometry:build
 ```
 
-Перед коммитом/релизом убедитесь, что сборка проходит на всех таргетах (Android, iOS).
-
 ---
 
-## Публикация
+## License
 
-<!-- TODO: заполнить по мере настройки: Maven Central, GPG, секреты в CI -->
-
-- [Publishing to Maven Central](https://www.jetbrains.com/help/kotlin/multiplatform-publish-libraries.html)
-- [Central Portal](https://central.sonatype.org/publish-ea/publish-ea-guide/)
-- [Gradle Maven Publish Plugin](https://vanniktech.github.io/gradle-maven-publish-plugin/central/)
-
----
-
-## Contributing
-
-<!-- TODO: добавить CONTRIBUTING.md и ссылку сюда; правила контрибуции, ветки, PR -->
-
-Приветствуются багфиксы и улучшения документации. Для крупных изменений лучше сначала обсудить в issue.
-
----
-
-## Лицензия
-
-<!-- TODO: указать фактическую лицензию (например, Apache-2.0) и год/автора -->
-
-См. файл [LICENSE](LICENSE).
+[Apache-2.0](LICENSE)
