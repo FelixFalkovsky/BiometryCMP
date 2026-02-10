@@ -14,17 +14,13 @@ import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import java.util.concurrent.Executor
 
 private const val AUTHENTICATORS_BIOMETRIC_STRONG = 0x0000000F
 private const val AUTHENTICATORS_DEVICE_CREDENTIAL = 0x00008000
 
-/**
- * Устанавливает [FragmentActivity] для показа диалога биометрии.
- * Вызывать из приложения (например, из [FragmentActivity.onCreate]) перед использованием [createBiometryAuthenticator].
- */
+
 fun setFragmentActivityForBiometry(activity: FragmentActivity?) {
     AndroidBiometryHolder.fragmentActivity = activity
 }
@@ -42,14 +38,14 @@ actual fun createBiometryAuthenticator(): BiometryAuthenticator {
 
 private class NoOpBiometryAuthenticator : BiometryAuthenticator {
     override suspend fun isBiometryAvailable(): BiometryAvailability =
-        BiometryAvailability(isAvailable = false, biometryType = BiometryType.NONE, errorMessage = "FragmentActivity not set. Call setFragmentActivityForBiometry(activity) first.")
+        BiometryAvailability(
+            isAvailable = false,
+            biometryType = BiometryType.NONE,
+            errorMessage = "FragmentActivity not set. Call setFragmentActivityForBiometry(activity) first."
+        )
 
-    override suspend fun authenticate(
-        title: String,
-        subtitle: String?,
-        negativeButtonText: String?,
-        allowDeviceCredentials: Boolean
-    ): BiometryResult = BiometryResult.Error("FragmentActivity not set", -1)
+    override suspend fun authenticate(request: AuthenticationRequest): BiometryResult =
+        BiometryResult.Error("FragmentActivity not set", -1)
 }
 
 internal class AndroidBiometryAuthenticator(
@@ -80,25 +76,28 @@ internal class AndroidBiometryAuthenticator(
     }
 
     override suspend fun authenticate(
-        title: String,
-        subtitle: String?,
-        negativeButtonText: String?,
-        allowDeviceCredentials: Boolean
+        request: AuthenticationRequest
     ): BiometryResult = suspendCancellableCoroutine { cont ->
-        val authenticators = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && allowDeviceCredentials) {
+        val authenticators = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && request.allowDeviceCredentials) {
             AUTHENTICATORS_BIOMETRIC_STRONG or AUTHENTICATORS_DEVICE_CREDENTIAL
         } else {
             AUTHENTICATORS_BIOMETRIC_STRONG
         }
         val promptInfoBuilder = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(title)
-            .apply { subtitle?.let { setSubtitle(it) } }
-            .apply { negativeButtonText?.let { setNegativeButtonText(it) } }
+            .setTitle(request.title)
+            .apply { request.subtitle?.let { setSubtitle(it) } }
+            // BiometricPrompt forbids negative button when device credentials are allowed.
+            // Set the button only when biometry-only mode is used.
+            .apply {
+                if (!request.allowDeviceCredentials) {
+                    setNegativeButtonText(request.negativeButtonText ?: "Cancel")
+                }
+            }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             promptInfoBuilder.setAllowedAuthenticators(authenticators)
         } else {
             @Suppress("DEPRECATION")
-            promptInfoBuilder.setDeviceCredentialAllowed(allowDeviceCredentials)
+            promptInfoBuilder.setDeviceCredentialAllowed(request.allowDeviceCredentials)
         }
         val promptInfo = promptInfoBuilder.build()
         val callback = object : BiometricPrompt.AuthenticationCallback() {
@@ -106,16 +105,17 @@ internal class AndroidBiometryAuthenticator(
                 cont.resume(BiometryResult.Success)
             }
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                val result = BiometryResult.fromAuthResponse(
-                    success = false,
-                    errorCode = errorCode,
-                    errorMessage = errString.toString(),
-                    isCancelledCode = { code ->
-                        code == BiometricPrompt.ERROR_USER_CANCELED ||
-                            code == BiometricPrompt.ERROR_NEGATIVE_BUTTON
-                    }
+                cont.resume(
+                    BiometryResultMapper.map(
+                        success = false,
+                        errorCode = errorCode,
+                        errorMessage = errString.toString(),
+                        isCancelledCode = { code ->
+                            code == BiometricPrompt.ERROR_USER_CANCELED ||
+                                code == BiometricPrompt.ERROR_NEGATIVE_BUTTON
+                        }
+                    )
                 )
-                cont.resume(result)
             }
             override fun onAuthenticationFailed() {
                 // Retry allowed; don't complete yet

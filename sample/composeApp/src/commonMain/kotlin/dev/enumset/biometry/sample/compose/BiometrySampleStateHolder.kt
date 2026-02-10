@@ -1,5 +1,6 @@
 package dev.enumset.biometry.sample.compose
 
+import dev.enumset.biometry.AuthenticationRequest
 import dev.enumset.biometry.BiometryAvailability
 import dev.enumset.biometry.BiometryAuthenticator
 import dev.enumset.biometry.BiometryResult
@@ -37,7 +38,7 @@ class BiometrySampleStateHolder(
                         biometryTypeText = if (availability.isAvailable) {
                             availability.biometryType.toString()
                         } else {
-                            availability.errorMessage ?: "Недоступно"
+                            availability.errorMessage ?: "Unavailable"
                         },
                         isAvailable = availability.isAvailable
                     )
@@ -46,21 +47,18 @@ class BiometrySampleStateHolder(
         }
     }
 
-    /** Закрывает sheet, запускает авторизацию, обновляет success/failure. */
+    /** Closes sheet, launches authentication, updates success/failure. */
     fun runAuth(
-        title: String = "Вход в приложение",
-        subtitle: String? = "Подтвердите личность",
-        negativeButtonText: String? = "Отмена",
-        allowDeviceCredentials: Boolean = true
+        request: AuthenticationRequest = AuthenticationRequest(
+            title = "Sign in",
+            subtitle = "Confirm your identity",
+            negativeButtonText = "Cancel",
+            allowDeviceCredentials = true
+        )
     ) {
         scope.launch {
             withContext(Dispatchers.Main) { closeSheet() }
-            val result = authenticator.authenticate(
-                title = title,
-                subtitle = subtitle,
-                negativeButtonText = negativeButtonText,
-                allowDeviceCredentials = allowDeviceCredentials
-            )
+            val result = authenticator.authenticate(request)
             withContext(Dispatchers.Main) {
                 _state.update {
                     it.copy(

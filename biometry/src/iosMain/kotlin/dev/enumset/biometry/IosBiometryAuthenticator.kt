@@ -57,20 +57,17 @@ internal class IosBiometryAuthenticator : BiometryAuthenticator {
         }
 
     override suspend fun authenticate(
-        title: String,
-        subtitle: String?,
-        negativeButtonText: String?,
-        allowDeviceCredentials: Boolean
+        request: AuthenticationRequest
     ): BiometryResult = suspendCancellableCoroutine { cont ->
         val context = LAContext()
-        val policy = if (allowDeviceCredentials) {
+        val policy = if (request.allowDeviceCredentials) {
             LAPolicy.DeviceOwnerAuthentication
         } else {
             LAPolicy.DeviceOwnerAuthenticationWithBiometrics
         }
-        context.evaluatePolicy(policy, title) { success, error ->
+        context.evaluatePolicy(policy, request.title) { success, error ->
             val result = runCatching {
-                BiometryResult.fromAuthResponse(
+                BiometryResultMapper.map(
                     success = success,
                     errorCode = error?.code?.toInt(),
                     errorMessage = error?.localizedDescription,
@@ -81,7 +78,10 @@ internal class IosBiometryAuthenticator : BiometryAuthenticator {
                     }
                 )
             }.getOrElse {
-                BiometryResult.Error(message = error?.localizedDescription ?: "Unknown error", code = -1)
+                BiometryResult.Error(
+                    message = error?.localizedDescription ?: "Unknown error",
+                    code = -1
+                )
             }
             cont.resume(result)
         }

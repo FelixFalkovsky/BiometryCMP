@@ -6,6 +6,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import dev.enumset.biometry.AuthenticationRequest
 import dev.enumset.biometry.BiometryResult
 import dev.enumset.biometry.createBiometryAuthenticator
 import dev.enumset.biometry.setFragmentActivityForBiometry
@@ -14,8 +15,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Демо-экран для проверки работы библиотеки biometry-auth.
- * Показывает проверку доступности биометрии и запуск диалога аутентификации.
+ * Demo screen for testing the biometry-auth library.
+ * Shows biometry availability check and authentication dialog.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -44,31 +45,33 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkAvailability() {
         lifecycleScope.launch(Dispatchers.Main) {
-            statusText.text = "Проверка…"
+            statusText.text = "Checking…"
             val availability = withContext(Dispatchers.Default) {
                 createBiometryAuthenticator().isBiometryAvailable()
             }
             statusText.text = if (availability.isAvailable) {
-                "Доступно: ${availability.biometryType}"
+                "Available: ${availability.biometryType}"
             } else {
-                "Недоступно: ${availability.errorMessage ?: "—"}"
+                "Unavailable: ${availability.errorMessage ?: "—"}"
             }
         }
     }
 
     private fun runAuthentication() {
         lifecycleScope.launch(Dispatchers.Main) {
-            statusText.text = "Ожидание аутентификации…"
+            statusText.text = "Waiting for authentication…"
             val result = createBiometryAuthenticator().authenticate(
-                title = "Вход в приложение",
-                subtitle = "Подтвердите личность для продолжения",
-                negativeButtonText = "Отмена",
-                allowDeviceCredentials = true
+                AuthenticationRequest(
+                    title = "Sign in",
+                    subtitle = "Confirm your identity to continue",
+                    negativeButtonText = "Cancel",
+                    allowDeviceCredentials = true
+                )
             )
             statusText.text = when (result) {
-                is BiometryResult.Success -> "Успешно"
-                is BiometryResult.Cancelled -> "Отменено"
-                is BiometryResult.Error -> "Ошибка: ${result.message} (код ${result.code})"
+                is BiometryResult.Success -> "Success"
+                is BiometryResult.Cancelled -> "Cancelled"
+                is BiometryResult.Error -> "Error: ${result.message} (code ${result.code})"
             }
             Toast.makeText(this@MainActivity, statusText.text, Toast.LENGTH_SHORT).show()
         }

@@ -6,7 +6,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 
 /**
- * Модальный нижний sheet для Android и iOS на базе [ModalBottomSheet] (Material3).
+ * Modal bottom sheet for Android and iOS based on [ModalBottomSheet] (Material3).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

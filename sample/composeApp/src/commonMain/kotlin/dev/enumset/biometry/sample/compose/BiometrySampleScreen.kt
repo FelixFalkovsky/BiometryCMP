@@ -97,7 +97,7 @@ private fun SuccessContent(onRepeat: () -> Unit) {
     Text("Success", style = MaterialTheme.typography.titleLarge)
     Spacer(Modifier.height(16.dp))
     OutlinedButton(onClick = onRepeat) {
-        Text("Повторить")
+        Text("Retry")
     }
 }
 
@@ -111,7 +111,7 @@ private fun FailureContent(onRepeat: () -> Unit) {
     Text("Failure", style = MaterialTheme.typography.titleLarge)
     Spacer(Modifier.height(16.dp))
     OutlinedButton(onClick = onRepeat) {
-        Text("Повторить")
+        Text("Retry")
     }
 }
 
@@ -127,7 +127,7 @@ private fun MainContent(onBiometryClick: () -> Unit) {
         onClick = onBiometryClick,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Биометрия")
+        Text("Biometry")
     }
 }
 
@@ -153,7 +153,7 @@ private fun SheetContent(
             modifier = Modifier.fillMaxWidth(),
             enabled = isAvailable
         ) {
-            Text("Войти по биометрии")
+            Text("Sign in with biometry")
         }
     }
 }

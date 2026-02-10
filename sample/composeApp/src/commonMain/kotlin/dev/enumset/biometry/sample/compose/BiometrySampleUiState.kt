@@ -1,7 +1,7 @@
 package dev.enumset.biometry.sample.compose
 
 /**
- * Неизменяемое состояние UI экрана биометрии (удобно для тестов и отладки).
+ * Immutable UI state of the biometry sample screen (convenient for tests and debugging).
  */
 data class BiometrySampleUiState(
     val authSuccess: Boolean = false,
